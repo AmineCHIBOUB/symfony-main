@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello MusicControlerController!{% endblock %}
+
+{% block body %}
+<ul>
+ {% for  music in musicLists%}
+   <li>{{music.name}}</li>
+   {%endfor%}
+</ul>
+{% endblock %}
