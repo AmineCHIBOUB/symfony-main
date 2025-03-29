@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}YouMusic !{% endblock %}
+
+{% block body %}
+    <h1>Créer une nouvelle musique</h1>
+
+    {{ form(form) }}
+
+    <a href="{{ path('app_music') }}">Retour</a>
+
+{% endblock %}

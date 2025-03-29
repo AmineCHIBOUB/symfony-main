@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}YouMusic !{% endblock %}
+
+{% block body %}
+    <h1>Liste des musiques disponibles</h1>
+
+    <a href="{{ path('app_music_new') }}">Ajouter une musique</a>
+    <ul>
+        {% for music in musicsList %}
+            <li>{{ music.name }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
