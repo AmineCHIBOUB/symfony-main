@@ -1,6 +1,6 @@
 # YouMusic — application Symfony 7
 
-[![CI](https://github.com/AmineCHIBOUB/symfony-main/actions/workflows/ci.yml/badge.svg)](https://github.com/AmineCHIBOUB/symfony-main/actions/workflows/ci.yml)
+[![CI](https://github.com/AmineCHIBOUB/symfony-main/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/AmineCHIBOUB/symfony-main/actions/workflows/ci.yml)
 
 Application web communautaire de partage de musique : chaque membre ajoute ses morceaux (lien YouTube ou autre), les classe par catégorie, met ses favoris en avant et compose des playlists publiques ou privées. Un back-office permet d'administrer l'ensemble du catalogue.
 
