@@ -1,3 +1,89 @@
+:root {
+    --ym-violet: #8b5cf6;
+    --ym-rose: #ec4899;
+    --ym-fond: #0f0f1a;
+    --ym-carte: #181828;
+}
+
 body {
-    background-color: skyblue;
+    background: var(--ym-fond);
+}
+
+.ym-nav {
+    background: rgba(15, 15, 26, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.text-gradient {
+    background: linear-gradient(90deg, var(--ym-violet), var(--ym-rose));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.btn-gradient {
+    background: linear-gradient(90deg, var(--ym-violet), var(--ym-rose));
+    border: 0;
+    color: #fff;
+}
+
+.btn-gradient:hover {
+    filter: brightness(1.1);
+    color: #fff;
+}
+
+.hero {
+    background:
+        radial-gradient(circle at 15% 20%, rgba(139, 92, 246, 0.35), transparent 45%),
+        radial-gradient(circle at 85% 70%, rgba(236, 72, 153, 0.25), transparent 45%);
+    border-radius: 1.5rem;
+}
+
+.ym-card {
+    background: var(--ym-carte);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ym-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(139, 92, 246, 0.25);
+}
+
+.ym-thumb {
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    width: 100%;
+    background: linear-gradient(135deg, #2a2340, #3b1f3a);
+}
+
+.ym-thumb-vide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.ym-stat {
+    background: var(--ym-carte);
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.badge-cat {
+    color: #fff;
+    font-weight: 500;
+}
+
+.stretched-link-z {
+    position: relative;
+    z-index: 2;
+}
+
+.ratio iframe {
+    border-radius: 1rem;
 }

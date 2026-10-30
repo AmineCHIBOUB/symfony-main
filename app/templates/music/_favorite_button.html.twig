@@ -1,0 +1,15 @@
+{# Bouton cœur : bascule le favori, revient sur la page courante #}
+{% set liked = app.user and app.user.hasFavorite(music) %}
+{% if app.user %}
+    <form method="post" action="{{ path('app_music_favorite', {id: music.id}) }}" class="stretched-link-z d-inline">
+        <input type="hidden" name="_token" value="{{ csrf_token('favorite-' ~ music.id) }}">
+        <input type="hidden" name="_back" value="{{ app.request.requestUri }}">
+        <button class="btn {{ small|default(false) ? 'btn-sm' : '' }} {{ liked ? 'btn-danger' : 'btn-outline-danger' }}"
+                title="{{ liked ? 'Retirer des favoris' : 'Ajouter aux favoris' }}">
+            <i class="bi {{ liked ? 'bi-heart-fill' : 'bi-heart' }}"></i>
+            <span class="ms-1">{{ music.favoredBy|length }}</span>
+        </button>
+    </form>
+{% else %}
+    <span class="small text-secondary"><i class="bi bi-heart"></i> {{ music.favoredBy|length }}</span>
+{% endif %}

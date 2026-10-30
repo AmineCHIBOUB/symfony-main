@@ -1,14 +1,62 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}YouMusic !{% endblock %}
+{% block title %}Catalogue{% endblock %}
 
 {% block body %}
-    <h1>Liste des musiques disponibles</h1>
+<div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <h1 class="h3 mb-0">Catalogue <small class="text-secondary fs-6">{{ musics|length }} morceau(x)</small></h1>
+        {% if app.user %}
+            <a href="{{ path('app_music_new') }}" class="btn btn-gradient"><i class="bi bi-plus-lg"></i> Ajouter une musique</a>
+        {% endif %}
+    </div>
 
-    <a href="{{ path('app_music_new') }}">Ajouter une musique</a>
-    <ul>
-        {% for music in musicsList %}
-            <li>{{ music.name }}</li>
+    <form class="row g-2 mb-4" method="get">
+        <div class="col-md-5">
+            <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Rechercher un titre ou un artiste">
+        </div>
+        <div class="col-6 col-md-3">
+            <select name="categorie" class="form-select" onchange="this.form.requestSubmit()">
+                <option value="">Toutes les catégories</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {{ currentCategory and currentCategory.id == category.id ? 'selected' }}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <select name="tri" class="form-select" onchange="this.form.requestSubmit()">
+                {% for value, label in {recent: 'Plus récents', populaire: 'Plus aimés', titre: 'Titre A → Z'} %}
+                    <option value="{{ value }}" {{ tri == value ? 'selected' }}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button class="btn btn-outline-light"><i class="bi bi-search"></i> Filtrer</button>
+        </div>
+    </form>
+
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+        {% for music in musics %}
+            <div class="col">{{ include('music/_card.html.twig') }}</div>
+        {% else %}
+            <div class="col-12 text-center text-secondary py-5">
+                <i class="bi bi-emoji-frown fs-1"></i>
+                <p class="mt-2">Aucun morceau ne correspond à votre recherche.</p>
+                <a href="{{ path('app_music') }}">Réinitialiser les filtres</a>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
+
+    {% if pages > 1 %}
+        <nav class="mt-4" aria-label="Pagination">
+            <ul class="pagination justify-content-center">
+                {% for p in 1..pages %}
+                    <li class="page-item {{ p == page ? 'active' }}">
+                        <a class="page-link" href="{{ path('app_music', app.request.query.all|merge({page: p})) }}">{{ p }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
 {% endblock %}

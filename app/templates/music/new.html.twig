@@ -1,12 +1,12 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}YouMusic !{% endblock %}
+{% block title %}Ajouter une musique{% endblock %}
 
 {% block body %}
-    <h1>Créer une nouvelle musique</h1>
-
-    {{ form(form) }}
-
-    <a href="{{ path('app_music') }}">Retour</a>
-
+<div class="container" style="max-width: 720px">
+    <h1 class="h3 mb-4"><i class="bi bi-plus-circle text-gradient"></i> Ajouter une musique</h1>
+    <div class="ym-card p-4">
+        {{ include('music/_form.html.twig', {button_label: 'Ajouter au catalogue', back_url: path('app_music')}) }}
+    </div>
+</div>
 {% endblock %}

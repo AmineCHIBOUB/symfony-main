@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: app
+
+jobs:
+  tests:
+    name: Tests PHPUnit (SQLite)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl, pdo_sqlite, zip
+          coverage: none
+
+      - name: Dépendances Composer
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Vérification des templates Twig et du conteneur
+        run: |
+          php bin/console lint:twig templates
+          php bin/console lint:container
+
+      - name: Tests unitaires et fonctionnels
+        run: |
+          set -o pipefail
+          php bin/phpunit --testdox 2>&1 | tee phpunit.log
+
+      - name: Résumé des erreurs
+        if: failure()
+        run: |
+          [ -f phpunit.log ] && grep -E -A6 "^[0-9]+\) |Error:|Exception" phpunit.log | head -60 | while IFS= read -r ligne; do echo "::error::$ligne"; done || true
+
+  base-mysql:
+    name: Migration et données de démo (MySQL)
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: youmusic
+        ports: ['3306:3306']
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      DATABASE_URL: mysql://root:@127.0.0.1:3306/youmusic?serverVersion=8.0.32&charset=utf8mb4
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: intl, pdo_mysql, zip
+          coverage: none
+
+      - name: Dépendances Composer
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Migration, validation du schéma et fixtures
+        run: |
+          set -o pipefail
+          {
+            php bin/console doctrine:migrations:migrate --no-interaction
+            php bin/console doctrine:schema:validate
+            php bin/console doctrine:fixtures:load --no-interaction
+          } 2>&1 | tee mysql.log
+
+      - name: Résumé des erreurs
+        if: failure()
+        run: |
+          php bin/console doctrine:schema:update --dump-sql 2>&1 | head -30 | while IFS= read -r ligne; do echo "::error::SQL attendu : $ligne"; done || true
+          [ -f mysql.log ] && grep -iE "error|exception|fail|\[" mysql.log | head -30 | while IFS= read -r ligne; do echo "::error::$ligne"; done || true

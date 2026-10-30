@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Playlists{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <h1 class="h3 mb-0">Playlists de la communauté</h1>
+        {% if app.user %}
+            <a href="{{ path('app_playlist_new') }}" class="btn btn-gradient"><i class="bi bi-plus-lg"></i> Nouvelle playlist</a>
+        {% endif %}
+    </div>
+
+    {% if app.user and app.user.playlists is not empty %}
+        <h2 class="h5 mb-3">Mes playlists</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-3 mb-5">
+            {% for playlist in app.user.playlists %}
+                <div class="col">{{ include('playlist/_card.html.twig') }}</div>
+            {% endfor %}
+        </div>
+        <h2 class="h5 mb-3">Publiques</h2>
+    {% endif %}
+
+    <div class="row row-cols-1 row-cols-md-3 g-3">
+        {% for playlist in publicPlaylists %}
+            <div class="col">{{ include('playlist/_card.html.twig') }}</div>
+        {% else %}
+            <p class="text-secondary">Aucune playlist publique pour le moment.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

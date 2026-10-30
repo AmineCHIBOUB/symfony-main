@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier {{ music.name }}{% endblock %}
+
+{% block body %}
+<div class="container" style="max-width: 720px">
+    <h1 class="h3 mb-4"><i class="bi bi-pencil text-gradient"></i> Modifier « {{ music.name }} »</h1>
+    <div class="ym-card p-4">
+        {{ include('music/_form.html.twig', {button_label: 'Enregistrer', back_url: path('app_music_show', {id: music.id})}) }}
+    </div>
+</div>
+{% endblock %}

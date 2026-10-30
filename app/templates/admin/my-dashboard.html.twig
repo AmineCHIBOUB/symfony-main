@@ -1,6 +1,62 @@
-{# templates/admin/my_dashboard.html.twig #}
-{% extends '@EasyAdmin/layout.html.twig' %}
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block page_title %}Tableau de bord{% endblock %}
 
 {% block main %}
-    Welcome to Music Dashboard
-{% endblock main %}
+    <div class="row g-3 mb-4">
+        {% for label, value in stats %}
+            <div class="col-6 col-lg-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-muted small">{{ label }}</div>
+                        <div class="fs-2 fw-bold">{{ value }}</div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header">Morceaux par catégorie</div>
+                <ul class="list-group list-group-flush">
+                    {% for row in categories %}
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between"><span>{{ row.category.name }}</span><strong>{{ row.total }}</strong></div>
+                            <div class="progress mt-1" style="height: 6px">
+                                <div class="progress-bar" style="width: {{ stats['Morceaux'] ? (row.total * 100 / stats['Morceaux'])|round : 0 }}%; background: {{ row.category.color }}"></div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header">Les plus aimés</div>
+                <ul class="list-group list-group-flush">
+                    {% for row in mostLiked %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>{{ row.music.name }}</span><span class="badge bg-danger">{{ row.total }} ♥</span>
+                        </li>
+                    {% else %}
+                        <li class="list-group-item text-muted">Aucun favori.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card h-100">
+                <div class="card-header">Derniers ajouts</div>
+                <ul class="list-group list-group-flush">
+                    {% for music in latest %}
+                        <li class="list-group-item">
+                            {{ music.name }}<br><small class="text-muted">{{ music.createdAt|date('d/m/Y H:i') }}{% if music.owner %} · {{ music.owner.displayName }}{% endif %}</small>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

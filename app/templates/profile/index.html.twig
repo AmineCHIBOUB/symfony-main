@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon espace{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="hero p-4 mb-4 d-flex flex-wrap align-items-center gap-3">
+        <i class="bi bi-person-circle display-4 text-gradient"></i>
+        <div>
+            <h1 class="h3 mb-0">{{ user.displayName }}</h1>
+            <small class="text-secondary">{{ user.email }} · membre depuis le {{ user.createdAt|date('d/m/Y') }}</small>
+        </div>
+    </div>
+
+    <ul class="nav nav-pills mb-4" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#favoris" type="button">Favoris <span class="badge bg-dark">{{ user.favorites|length }}</span></button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#playlists" type="button">Playlists <span class="badge bg-dark">{{ user.playlists|length }}</span></button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#ajouts" type="button">Mes ajouts <span class="badge bg-dark">{{ user.musics|length }}</span></button></li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="favoris">
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+                {% for music in user.favorites %}
+                    <div class="col">{{ include('music/_card.html.twig') }}</div>
+                {% else %}
+                    <p class="text-secondary">Cliquez sur <i class="bi bi-heart"></i> pour ajouter un morceau à vos favoris.</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="tab-pane fade" id="playlists">
+            <a href="{{ path('app_playlist_new') }}" class="btn btn-sm btn-gradient mb-3"><i class="bi bi-plus-lg"></i> Nouvelle playlist</a>
+            <div class="row row-cols-1 row-cols-md-3 g-3">
+                {% for playlist in user.playlists %}
+                    <div class="col">{{ include('playlist/_card.html.twig') }}</div>
+                {% else %}
+                    <p class="text-secondary">Aucune playlist.</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="tab-pane fade" id="ajouts">
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+                {% for music in user.musics %}
+                    <div class="col">{{ include('music/_card.html.twig') }}</div>
+                {% else %}
+                    <p class="text-secondary">Vous n'avez encore ajouté aucun morceau.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

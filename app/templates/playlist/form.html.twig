@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ playlist ? 'Modifier la playlist' : 'Nouvelle playlist' }}{% endblock %}
+
+{% block body %}
+<div class="container" style="max-width: 720px">
+    <h1 class="h3 mb-4">{{ playlist ? 'Modifier « ' ~ playlist.name ~ ' »' : 'Nouvelle playlist' }}</h1>
+    <div class="ym-card p-4">
+        {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <div class="d-flex gap-2 mt-3">
+                <button class="btn btn-gradient">{{ playlist ? 'Enregistrer' : 'Créer la playlist' }}</button>
+                <a class="btn btn-outline-light" href="{{ playlist ? path('app_playlist_show', {id: playlist.id}) : path('app_playlist_index') }}">Annuler</a>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

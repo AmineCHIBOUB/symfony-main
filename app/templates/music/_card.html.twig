@@ -1,0 +1,22 @@
+{# Carte d'un morceau : vignette, titre, artiste, catégorie et bouton favori #}
+<div class="ym-card h-100 position-relative">
+    {% if music.thumbnailUrl %}
+        <img class="ym-thumb" src="{{ music.thumbnailUrl }}" alt="" loading="lazy">
+    {% else %}
+        <div class="ym-thumb ym-thumb-vide"><i class="bi bi-music-note-beamed"></i></div>
+    {% endif %}
+    <div class="p-3">
+        <h3 class="h6 mb-1 text-truncate">
+            <a class="stretched-link text-reset text-decoration-none" href="{{ path('app_music_show', {id: music.id}) }}">{{ music.name }}</a>
+        </h3>
+        <div class="small text-secondary text-truncate mb-2">{{ music.auteur ?: 'Artiste inconnu' }}</div>
+        <div class="d-flex justify-content-between align-items-center">
+            {% if music.category %}
+                <span class="badge badge-cat" style="background: {{ music.category.color }}">{{ music.category.name }}</span>
+            {% else %}
+                <span></span>
+            {% endif %}
+            {{ include('music/_favorite_button.html.twig', {small: true}) }}
+        </div>
+    </div>
+</div>

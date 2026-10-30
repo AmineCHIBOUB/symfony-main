@@ -12,12 +12,13 @@ services:
       - dev
 
   mysql:
-    image: mysql
+    image: mysql:8.0
     container_name: mysql
     volumes:
       - ./mysql:/var/lib/mysql
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_DATABASE: youmusic
     networks:
       - dev
 

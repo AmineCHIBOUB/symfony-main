@@ -3,14 +3,19 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Table(name: 'app_user')]
+#[ORM\HasLifecycleCallbacks]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[UniqueEntity(fields: ['email'], message: 'Un compte existe déjà avec cet e-mail.')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -19,6 +24,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Assert\NotBlank]
+    #[Assert\Email(message: 'Adresse e-mail invalide.')]
     private ?string $email = null;
 
     /**
@@ -33,8 +40,64 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Assert\Length(max: 50)]
     private ?string $username = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    /**
+     * @var Collection<int, Music>
+     */
+    #[ORM\ManyToMany(targetEntity: Music::class, inversedBy: 'favoredBy')]
+    #[ORM\JoinTable(name: 'user_favorite')]
+    private Collection $favorites;
+
+    /**
+     * @var Collection<int, Music>
+     */
+    #[ORM\OneToMany(targetEntity: Music::class, mappedBy: 'owner')]
+    private Collection $musics;
+
+    /**
+     * @var Collection<int, Playlist>
+     */
+    #[ORM\OneToMany(targetEntity: Playlist::class, mappedBy: 'owner', orphanRemoval: true)]
+    #[ORM\OrderBy(['createdAt' => 'DESC'])]
+    private Collection $playlists;
+
+    public function __construct()
+    {
+        $this->favorites = new ArrayCollection();
+        $this->musics = new ArrayCollection();
+        $this->playlists = new ArrayCollection();
+    }
+
+    #[ORM\PrePersist]
+    public function initCreatedAt(): void
+    {
+        $this->createdAt ??= new \DateTimeImmutable();
+    }
+
+    public function __toString(): string
+    {
+        return $this->getDisplayName();
+    }
+
+    /**
+     * Pseudo s'il existe, sinon la partie avant le @ de l'e-mail.
+     */
+    public function getDisplayName(): string
+    {
+        if ($this->username) {
+            return $this->username;
+        }
+
+        $local = strstr((string) $this->email, '@', true);
+
+        return false !== $local ? $local : (string) $this->email;
+    }
 
     public function getId(): ?int
     {
@@ -46,7 +109,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function setEmail(string $email): static
+    public function setEmail(?string $email): static
     {
         $this->email = $email;
 
@@ -74,7 +137,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
-        return array_unique($roles);
+        return array_values(array_unique($roles));
     }
 
     /**
@@ -85,6 +148,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->roles = $roles;
 
         return $this;
+    }
+
+    public function isAdmin(): bool
+    {
+        return in_array('ROLE_ADMIN', $this->getRoles(), true);
     }
 
     /**
@@ -107,8 +175,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials(): void
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
     }
 
     public function getUsername(): ?string
@@ -122,26 +188,63 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    /**
+     * @return Collection<int, Music>
+     */
+    public function getFavorites(): Collection
     {
-        $this->createdAt = $createdAt;
+        return $this->favorites;
+    }
+
+    public function hasFavorite(Music $music): bool
+    {
+        return $this->favorites->contains($music);
+    }
+
+    public function addFavorite(Music $music): static
+    {
+        if (!$this->favorites->contains($music)) {
+            $this->favorites->add($music);
+        }
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function removeFavorite(Music $music): static
     {
-        return $this->updatedAt;
+        $this->favorites->removeElement($music);
+
+        return $this;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    /**
+     * @return Collection<int, Music>
+     */
+    public function getMusics(): Collection
     {
-        $this->updatedAt = $updatedAt;
+        return $this->musics;
+    }
+
+    /**
+     * @return Collection<int, Playlist>
+     */
+    public function getPlaylists(): Collection
+    {
+        return $this->playlists;
+    }
+
+    public function addPlaylist(Playlist $playlist): static
+    {
+        if (!$this->playlists->contains($playlist)) {
+            $this->playlists->add($playlist);
+            $playlist->setOwner($this);
+        }
 
         return $this;
     }

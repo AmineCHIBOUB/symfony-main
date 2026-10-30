@@ -1,17 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr" data-bs-theme="dark">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}YouMusic{% endblock %} · YouMusic</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎵</text></svg>">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        {% block stylesheets %}{% endblock %}
 
         {% block javascripts %}
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
-    <body>
-        {% block body %}{% endblock %}
+    <body class="d-flex flex-column min-vh-100">
+        <nav class="navbar navbar-expand-lg sticky-top ym-nav">
+            <div class="container">
+                <a class="navbar-brand fw-bold" href="{{ path('app_home') }}">
+                    <i class="bi bi-vinyl-fill text-gradient"></i> You<span class="text-gradient">Music</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu" aria-label="Menu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="menu">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item"><a class="nav-link" href="{{ path('app_music') }}"><i class="bi bi-music-note-list"></i> Catalogue</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ path('app_playlist_index') }}"><i class="bi bi-collection-play"></i> Playlists</a></li>
+                    </ul>
+                    <form class="d-flex me-lg-3 my-2 my-lg-0" role="search" action="{{ path('app_music') }}">
+                        <input class="form-control form-control-sm" type="search" name="q" placeholder="Titre, artiste…" aria-label="Rechercher">
+                    </form>
+                    <ul class="navbar-nav">
+                        {% if app.user %}
+                            <li class="nav-item"><a class="btn btn-sm btn-gradient me-lg-2 my-1" href="{{ path('app_music_new') }}"><i class="bi bi-plus-lg"></i> Ajouter</a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-person-circle"></i> {{ app.user.displayName }}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="{{ path('app_profile') }}"><i class="bi bi-person"></i> Mon espace</a></li>
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                        <li><a class="dropdown-item" href="{{ path('admin') }}"><i class="bi bi-speedometer2"></i> Administration</a></li>
+                                    {% endif %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="{{ path('app_logout') }}"><i class="bi bi-box-arrow-right"></i> Déconnexion</a></li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="nav-item"><a class="nav-link" href="{{ path('app_login') }}">Connexion</a></li>
+                            <li class="nav-item"><a class="btn btn-sm btn-gradient ms-lg-2 my-1" href="{{ path('app_register') }}">Créer un compte</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <main class="flex-grow-1">
+            <div class="container mt-3">
+                {% for type, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+
+            {% block body %}{% endblock %}
+        </main>
+
+        <footer class="py-4 mt-5 border-top border-secondary-subtle">
+            <div class="container d-flex flex-wrap justify-content-between small text-secondary">
+                <span>YouMusic — projet Symfony 7 réalisé par Amine Chiboub</span>
+                <span>Symfony · Doctrine · Twig · EasyAdmin · Bootstrap</span>
+            </div>
+        </footer>
     </body>
 </html>

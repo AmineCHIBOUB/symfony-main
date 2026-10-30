@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+<div class="container">
+    <section class="hero p-4 p-md-5 mb-5">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <h1 class="display-5 fw-bold">Partagez la musique <span class="text-gradient">que vous aimez</span>.</h1>
+                <p class="lead text-secondary">Ajoutez vos morceaux préférés, classez-les par catégorie, likez ceux des autres et créez vos playlists.</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ path('app_music') }}" class="btn btn-gradient btn-lg"><i class="bi bi-play-fill"></i> Explorer le catalogue</a>
+                    {% if not app.user %}
+                        <a href="{{ path('app_register') }}" class="btn btn-outline-light btn-lg">Rejoindre YouMusic</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="row g-3 text-center">
+                    {% for label, value in {'Morceaux': stats.musics, 'Membres': stats.users, 'Playlists publiques': stats.playlists} %}
+                        <div class="col-4">
+                            <div class="ym-stat p-3">
+                                <div class="fs-2 fw-bold text-gradient">{{ value }}</div>
+                                <div class="small text-secondary">{{ label }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if categories is not empty %}
+        <section class="mb-5">
+            <h2 class="h4 mb-3">Catégories</h2>
+            <div class="d-flex flex-wrap gap-2">
+                {% for row in categories %}
+                    <a class="btn btn-sm rounded-pill text-white" style="background: {{ row.category.color }}"
+                       href="{{ path('app_music', {categorie: row.category.id}) }}">
+                        {{ row.category.name }} <span class="badge bg-dark bg-opacity-25">{{ row.total }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+
+    <section class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h4 mb-0">Derniers ajouts</h2>
+            <a href="{{ path('app_music') }}" class="small">Tout voir <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+            {% for music in latest %}
+                <div class="col">{{ include('music/_card.html.twig') }}</div>
+            {% else %}
+                <p class="text-secondary">Aucun morceau pour l'instant. Soyez le premier à en ajouter un !</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <div class="row g-4">
+        <section class="col-lg-6">
+            <h2 class="h4 mb-3"><i class="bi bi-fire text-danger"></i> Les plus aimés</h2>
+            <ol class="list-group list-group-numbered">
+                {% for row in mostLiked %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a class="ms-2 me-auto text-reset text-decoration-none" href="{{ path('app_music_show', {id: row.music.id}) }}">
+                            <div class="fw-semibold">{{ row.music.name }}</div>
+                            <small class="text-secondary">{{ row.music.auteur }}</small>
+                        </a>
+                        <span class="badge bg-danger rounded-pill"><i class="bi bi-heart-fill"></i> {{ row.total }}</span>
+                    </li>
+                {% else %}
+                    <li class="list-group-item text-secondary">Pas encore de favoris.</li>
+                {% endfor %}
+            </ol>
+        </section>
+        <section class="col-lg-6">
+            <h2 class="h4 mb-3"><i class="bi bi-collection-play"></i> Playlists de la communauté</h2>
+            <div class="list-group">
+                {% for playlist in playlists %}
+                    <a class="list-group-item list-group-item-action" href="{{ path('app_playlist_show', {id: playlist.id}) }}">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-semibold">{{ playlist.name }}</span>
+                            <small class="text-secondary">{{ playlist.musics|length }} titre(s)</small>
+                        </div>
+                        <small class="text-secondary">par {{ playlist.owner.displayName }}</small>
+                    </a>
+                {% else %}
+                    <div class="list-group-item text-secondary">Aucune playlist publique.</div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

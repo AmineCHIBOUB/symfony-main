@@ -1,0 +1,12 @@
+{{ form_start(form) }}
+    <div class="row">
+        <div class="col-md-6">{{ form_row(form.name) }}</div>
+        <div class="col-md-6">{{ form_row(form.auteur) }}</div>
+    </div>
+    {{ form_row(form.url) }}
+    {{ form_row(form.category) }}
+    <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-gradient">{{ button_label }}</button>
+        <a href="{{ back_url }}" class="btn btn-outline-light">Annuler</a>
+    </div>
+{{ form_end(form) }}

@@ -1,0 +1,16 @@
+<div class="ym-card p-3 h-100 position-relative">
+    <div class="d-flex gap-1 mb-3">
+        {% for music in playlist.musics|slice(0, 4) %}
+            {% if music.thumbnailUrl %}
+                <img src="{{ music.thumbnailUrl }}" alt="" class="rounded" style="width: 25%; aspect-ratio: 1; object-fit: cover" loading="lazy">
+            {% endif %}
+        {% else %}
+            <div class="ym-thumb ym-thumb-vide rounded"><i class="bi bi-collection-play"></i></div>
+        {% endfor %}
+    </div>
+    <h3 class="h6 mb-1">
+        <a class="stretched-link text-reset text-decoration-none" href="{{ path('app_playlist_show', {id: playlist.id}) }}">{{ playlist.name }}</a>
+        {% if not playlist.public %}<i class="bi bi-lock-fill text-secondary" title="Privée"></i>{% endif %}
+    </h3>
+    <small class="text-secondary">{{ playlist.musics|length }} titre(s) · par {{ playlist.owner.displayName }}</small>
+</div>

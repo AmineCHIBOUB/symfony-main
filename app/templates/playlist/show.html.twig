@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ playlist.name }}{% endblock %}
+
+{% block body %}
+<div class="container">
+    <a href="{{ path('app_playlist_index') }}" class="small"><i class="bi bi-arrow-left"></i> Playlists</a>
+
+    <div class="hero p-4 my-3">
+        <div class="d-flex flex-wrap justify-content-between gap-3">
+            <div>
+                <span class="badge {{ playlist.public ? 'bg-success' : 'bg-secondary' }} mb-2">
+                    <i class="bi {{ playlist.public ? 'bi-globe' : 'bi-lock-fill' }}"></i> {{ playlist.public ? 'Publique' : 'Privée' }}
+                </span>
+                <h1 class="h2 mb-1">{{ playlist.name }}</h1>
+                {% if playlist.description %}<p class="text-secondary mb-1">{{ playlist.description }}</p>{% endif %}
+                <small class="text-secondary">par {{ playlist.owner.displayName }} · {{ playlist.musics|length }} titre(s)</small>
+            </div>
+            {% if is_granted('PLAYLIST_EDIT', playlist) %}
+                <div class="d-flex gap-2 align-items-start">
+                    <a class="btn btn-outline-warning" href="{{ path('app_playlist_edit', {id: playlist.id}) }}"><i class="bi bi-pencil"></i> Modifier</a>
+                    <form method="post" action="{{ path('app_playlist_delete', {id: playlist.id}) }}" onsubmit="return confirm('Supprimer cette playlist ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete-playlist-' ~ playlist.id) }}">
+                        <button class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="list-group">
+        {% for music in playlist.musics %}
+            <div class="list-group-item d-flex align-items-center gap-3">
+                <span class="text-secondary" style="width: 1.5rem">{{ loop.index }}</span>
+                {% if music.thumbnailUrl %}
+                    <img src="{{ music.thumbnailUrl }}" alt="" width="80" class="rounded" loading="lazy">
+                {% endif %}
+                <a class="me-auto text-reset text-decoration-none" href="{{ path('app_music_show', {id: music.id}) }}">
+                    <span class="d-block fw-semibold">{{ music.name }}</span>
+                    <small class="text-secondary">{{ music.auteur }}</small>
+                </a>
+                {% if is_granted('PLAYLIST_EDIT', playlist) %}
+                    <form method="post" action="{{ path('app_playlist_remove_music', {id: playlist.id, music: music.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('remove-' ~ playlist.id ~ '-' ~ music.id) }}">
+                        <button class="btn btn-sm btn-outline-secondary" title="Retirer de la playlist"><i class="bi bi-x-lg"></i></button>
+                    </form>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="list-group-item text-secondary text-center py-4">
+                Playlist vide. Ouvrez un morceau du <a href="{{ path('app_music') }}">catalogue</a> pour l'ajouter ici.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
